@@ -41,7 +41,6 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/btTrue"
         android:layout_below="@+id/btTrue"
-
         android:text="PREV" />
 
     <Button
@@ -51,4 +50,25 @@
         android:layout_alignTop="@+id/btPrev"
         android:layout_toEndOf="@+id/btTrue"
         android:text="NEXT" />
+
+    <ImageButton
+        android:id="@+id/ivPrev"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="#00ffffff"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/l"
+        android:layout_below="@+id/btPrev"
+        android:layout_marginLeft="120dp"
+       />
+
+    <ImageButton
+        android:id="@+id/ivNext"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="#00ffffff"
+        app:srcCompat="@drawable/r"
+        android:scaleType="centerCrop"
+        android:layout_alignTop="@+id/ivPrev"
+        android:layout_alignStart="@+id/btNext" />
 </RelativeLayout>

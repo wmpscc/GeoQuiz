@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.style.QuoteSpan;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mPriveButton;
     private TextView mQuestionTextView;
     private int mCurrentIndex=0;
+    private ImageButton mPriveImageButton;
+    private ImageButton mNextImageButton;
 
     private Question[] mQuestionsBank=new Question[]{
             new Question(R.string.question_africa,false),
@@ -33,10 +37,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-
         int question=mQuestionsBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
+        setListener();
 
+
+
+
+
+
+    }
+
+
+    private void setListener(){
+
+        mPriveImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mCurrentIndex-1<0){
+                    mCurrentIndex=(mCurrentIndex-1)*-1;
+                    int messageResId=0;
+                    messageResId=R.string.isTop;
+                    Toast.makeText(view.getContext(),messageResId,Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    mCurrentIndex=(mCurrentIndex-1)%mQuestionsBank.length;
+                    updateQuestion();
+                }
+            }
+        });
+
+        mNextImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCurrentIndex=(mCurrentIndex+1)%mQuestionsBank.length;
+                updateQuestion();
+            }
+        });
+        mQuestionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCurrentIndex=(mCurrentIndex+1)%mQuestionsBank.length;
+                updateQuestion();
+            }
+        });
         mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,15 +112,12 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(view.getContext(),messageResId,Toast.LENGTH_SHORT).show();
                 }
                 else{
-                mCurrentIndex=(mCurrentIndex-1)%mQuestionsBank.length;
-                updateQuestion();
+                    mCurrentIndex=(mCurrentIndex-1)%mQuestionsBank.length;
+                    updateQuestion();
                 }
             }
         });
-
     }
-
-
     private void checkAnswer(boolean userPressedTrue){
         int messageResId=0;
         boolean answer=mQuestionsBank[mCurrentIndex].isAnswerTrue();
@@ -104,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
         mFalseButton= (Button) findViewById(R.id.btFalse);
         mNextButton= (Button) findViewById(R.id.btNext);
         mPriveButton= (Button) findViewById(R.id.btPrev);
-
+        mNextImageButton= (ImageButton) findViewById(R.id.ivNext);
+        mPriveImageButton= (ImageButton) findViewById(R.id.ivPrev);
     }
 
 }
