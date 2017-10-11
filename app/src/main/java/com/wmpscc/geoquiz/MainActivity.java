@@ -1,8 +1,10 @@
 package com.wmpscc.geoquiz;
 
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.style.QuoteSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -10,8 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+
 public class MainActivity extends AppCompatActivity {
 
+    private static final String KEY_INDEX="index";
+    private static final String TAG ="GeoQuiz";
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
@@ -20,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private int mCurrentIndex=0;
     private ImageButton mPriveImageButton;
     private ImageButton mNextImageButton;
+    private int[] cover=new int[5];
+    private int local=0;
+    private int score=0;
 
     private Question[] mQuestionsBank=new Question[]{
             new Question(R.string.question_africa,false),
@@ -36,14 +45,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if(savedInstanceState!=null)
+        {
+            mCurrentIndex=savedInstanceState.getInt(KEY_INDEX,0);
+        }
+
         initView();
         int question=mQuestionsBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
         setListener();
 
 
+    }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG,"onSaveInstanceState");
+        outState.putInt(KEY_INDEX,mCurrentIndex);
 
 
     }
@@ -54,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         mPriveImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                local++;
                 if(mCurrentIndex-1<0){
                     mCurrentIndex=(mCurrentIndex-1)*-1;
                     int messageResId=0;
@@ -70,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         mNextImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                local++;
                 mCurrentIndex=(mCurrentIndex+1)%mQuestionsBank.length;
                 updateQuestion();
             }
@@ -85,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkAnswer(true);
+                mTrueButton.setClickable(false);
+                mFalseButton.setClickable(false);
             }
         });
 
@@ -92,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkAnswer(false);
+                mTrueButton.setClickable(false);
+                mFalseButton.setClickable(false);
             }
         });
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         int messageResId=0;
         boolean answer=mQuestionsBank[mCurrentIndex].isAnswerTrue();
         if(answer==userPressedTrue){
+            score++;
             messageResId=R.string.isTrue;
         }else{
             messageResId=R.string.isFalse;
@@ -132,10 +159,20 @@ public class MainActivity extends AppCompatActivity {
     }
     private void updateQuestion()
     {
+        mTrueButton.setClickable(true);
+        mFalseButton.setClickable(true);
+        for(int i=0;i<5;i++){
+            if(cover[i]==mCurrentIndex){
+                mTrueButton.setClickable(false);
+                mFalseButton.setClickable(false);
+            }
+        }
         int question=mQuestionsBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
-
-
+        cover[local%mQuestionsBank.length]=mCurrentIndex;
+        if(local%mQuestionsBank.length==mQuestionsBank.length-1){
+            Toast.makeText(this,"答题结束，正确率"+score/mQuestionsBank.length*100+"%",Toast.LENGTH_SHORT).show();
+        }
 
     }
     private void initView()
