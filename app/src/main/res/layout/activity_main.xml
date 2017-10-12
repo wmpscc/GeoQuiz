@@ -71,4 +71,13 @@
         android:scaleType="centerCrop"
         android:layout_alignTop="@+id/ivPrev"
         android:layout_alignStart="@+id/btNext" />
+
+    <Button
+        android:id="@+id/cheat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivPrev"
+        android:layout_centerHorizontal="true"
+        android:padding="20dp"
+        android:text="@string/cheat_button"/>
 </RelativeLayout>
