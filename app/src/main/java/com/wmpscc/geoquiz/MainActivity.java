@@ -1,5 +1,7 @@
 package com.wmpscc.geoquiz;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,10 +20,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String KEY_INDEX="index";
     private static final String TAG ="GeoQuiz";
+    private static final int REQUEST_CODE_CHEAT=0;
+    private boolean mIsCheater;
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mNextButton;
     private Button mPriveButton;
+    private Button mCheatButton;
     private TextView mQuestionTextView;
     private int mCurrentIndex=0;
     private ImageButton mPriveImageButton;
@@ -58,6 +63,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode!= Activity.RESULT_OK){
+            return;
+        }
+        if(requestCode==REQUEST_CODE_CHEAT){
+            if(data==null){
+             return;
+            }
+            mIsCheater=CheatActivity.wasAnswerShown(data);
+        }
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -93,13 +111,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 local++;
                 mCurrentIndex=(mCurrentIndex+1)%mQuestionsBank.length;
+                mIsCheater=false;
                 updateQuestion();
             }
         });
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentIndex=(mCurrentIndex+1)%mQuestionsBank.length;
+                mCurrentIndex= (mCurrentIndex+1)%mQuestionsBank.length;
                 updateQuestion();
             }
         });
@@ -124,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mCurrentIndex=(mCurrentIndex+1)%mQuestionsBank.length;
+                mIsCheater=false;
                 updateQuestion();
             }
         });
@@ -143,15 +163,31 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent=new Intent(MainActivity.this,CheatActivity.class);
+                boolean answerIsTure=mQuestionsBank[mCurrentIndex].isAnswerTrue();
+                Intent intent=CheatActivity.newIntent(MainActivity.this,answerIsTure);
+//                startActivity(intent);
+                startActivityForResult(intent,REQUEST_CODE_CHEAT);
+
+            }
+        });
     }
     private void checkAnswer(boolean userPressedTrue){
         int messageResId=0;
         boolean answer=mQuestionsBank[mCurrentIndex].isAnswerTrue();
-        if(answer==userPressedTrue){
-            score++;
-            messageResId=R.string.isTrue;
+        if(mIsCheater) {
+            messageResId=R.string.judgement_toast;
         }else{
-            messageResId=R.string.isFalse;
+            if (answer == userPressedTrue) {
+                score++;
+                messageResId = R.string.isTrue;
+            } else {
+                messageResId = R.string.isFalse;
+            }
         }
         Toast.makeText(this,messageResId,Toast.LENGTH_SHORT).show();;
 
@@ -182,8 +218,10 @@ public class MainActivity extends AppCompatActivity {
         mFalseButton= (Button) findViewById(R.id.btFalse);
         mNextButton= (Button) findViewById(R.id.btNext);
         mPriveButton= (Button) findViewById(R.id.btPrev);
+        mCheatButton= (Button) findViewById(R.id.cheat_button);
         mNextImageButton= (ImageButton) findViewById(R.id.ivNext);
         mPriveImageButton= (ImageButton) findViewById(R.id.ivPrev);
+
     }
 
 }

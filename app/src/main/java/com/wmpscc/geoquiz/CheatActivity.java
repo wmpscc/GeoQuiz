@@ -2,6 +2,7 @@ package com.wmpscc.geoquiz;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +15,8 @@ public class CheatActivity extends AppCompatActivity {
 
     private static final String EXTRA_ANSWER_IS_TRUE="com.wmpscc.geoquiz.answer_is_true";
     private static final String EXTRA_ANSWER_SHOWN="com.wmpscc.geoquiz.answer_show";
+    private static final String KEY_RESULT="result";
+    private boolean isCheat=false;
     private boolean mAnswerIsTure;
     private TextView mAnswerTextView;
     private Button mShowAnswerButton;
@@ -51,7 +54,14 @@ public class CheatActivity extends AppCompatActivity {
 
     }
 
-   private void setAnswerShowResult(boolean isAnswerShown){
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_RESULT,isCheat);
+    }
+
+    private void setAnswerShowResult(boolean isAnswerShown){
+        isCheat=true;
        Intent data=new Intent();
        data.putExtra(EXTRA_ANSWER_SHOWN,isAnswerShown);
        setResult(RESULT_OK,data);
